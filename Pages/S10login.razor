@@ -1,0 +1,33 @@
+﻿@page "/S10login"
+<h3>s10login</h3>
+
+
+<div class="container" style="max-width:400px;">
+    <div class="container" style="width:150px;">
+        <ACitylifeLogo></ACitylifeLogo>
+    </div>
+   
+    <div class="form-group">
+        <label for="userName">User Name</label>
+        <input type="text" class="form-control" id="userName">
+        <div id="validationUserName" class="invalid-feedback">
+            Please provide a valid email.
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password">
+        <div id="validationPassword" class="invalid-feedback">
+            Such email and password combination was not found.
+        </div>
+    </div>
+    <button class="btn btn-primary">Login</button>
+</div>
+
+
+
+
+
+@code {
+
+}

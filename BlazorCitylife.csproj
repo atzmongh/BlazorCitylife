@@ -17,4 +17,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\images\citylife logo.png" />
+  </ItemGroup>
+
 </Project>

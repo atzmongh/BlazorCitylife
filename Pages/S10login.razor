@@ -1,27 +1,30 @@
-﻿@page "/S10login"
-<h3>s10login</h3>
+﻿@using BlazorCitylife.Models 
+@using BlazorCitylife.Data 
+@page "/S10login"
+@inject CitylifeDBService  cityLifeDB
+<h3>Login</h3>
 
 
 <div class="container" style="max-width:400px;">
     <div class="container" style="width:150px;">
-        <ACitylifeLogo></ACitylifeLogo>
+        <img src="/images/citylife logo.png" style="width:80px;" />
     </div>
    
     <div class="form-group">
         <label for="userName">User Name</label>
-        <input type="text" class="form-control" id="userName">
+        <input type="text" class="form-control @userNameValidity" id="userName" @bind="userName">
         <div id="validationUserName" class="invalid-feedback">
             Please provide a valid email.
         </div>
     </div>
     <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" class="form-control" id="password">
+        <input type="password" class="form-control @passwordValidity" id="password" @bind="password">
         <div id="validationPassword" class="invalid-feedback">
             Such email and password combination was not found.
         </div>
     </div>
-    <button class="btn btn-primary">Login</button>
+    <button class="btn btn-primary" @onclick="LoginClicked">Login</button>
 </div>
 
 
@@ -29,5 +32,26 @@
 
 
 @code {
+    public string userName { get; set; }
+    public string password { get; set; }
+    public string userNameValidity = "";
+    public string passwordValidity = "";
+    private Employee loggedInUser = null;
+    public void LoginClicked()
+    {
+        if (userName == "")
+        {
+            userNameValidity = "is-invalid";
+        }
+        else
+        {
+            loggedInUser = cityLifeDB.UserLoggedin(userName, password);
+            if (loggedInUser == null)
+            {
+                passwordValidity = "is-invalid";
+            }
+        }
+
+    }
 
 }

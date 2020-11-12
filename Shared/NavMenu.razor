@@ -1,5 +1,9 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazorCitylife</a>
+﻿@using BlazorCitylife.Models
+@using BlazorCitylife.Data
+@inject CitylifeDBService  cityLifeDB
+<div class="top-row pl-4 navbar navbar-dark">
+    
+    <a class="navbar-brand" href="">Citylife Blazor</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>

@@ -1,15 +1,22 @@
-﻿@using BlazorCitylife.Models 
-@using BlazorCitylife.Data 
+﻿@using BlazorCitylife.Models
+@using BlazorCitylife.Data
 @page "/S10login"
 @inject CitylifeDBService  cityLifeDB
-<h3>Login</h3>
+@{
+    string loggedUserName = "none";
+    if (cityLifeDB.LoggedinUser != null)
+    {
+        loggedUserName = cityLifeDB.LoggedinUser.Name;
+    }
+}
+<h3>Login: @loggedUserName </h3>
 
 
 <div class="container" style="max-width:400px;">
     <div class="container" style="width:150px;">
         <img src="/images/citylife logo.png" style="width:80px;" />
     </div>
-   
+
     <div class="form-group">
         <label for="userName">User Name</label>
         <input type="text" class="form-control @userNameValidity" id="userName" @bind="userName">
@@ -32,7 +39,19 @@
 
 
 @code {
-    public string userName { get; set; }
+    private string _userName;
+    public string userName
+    {
+        get { return _userName; }
+        set
+        {
+            _userName = value;
+            if (_userName.Trim() != "")
+            {
+                userNameValidity = "";   //if it was invalid - it will change to be valid.
+            }
+        }
+    }
     public string password { get; set; }
     public string userNameValidity = "";
     public string passwordValidity = "";
@@ -41,7 +60,7 @@
     {
         if (userName == "")
         {
-            userNameValidity = "is-invalid";
+            userNameValidity = "is-invalid";  //CSS class for invalid input
         }
         else
         {
@@ -49,6 +68,11 @@
             if (loggedInUser == null)
             {
                 passwordValidity = "is-invalid";
+            }
+            else
+            {
+                userNameValidity = "";
+                passwordValidity = "";
             }
         }
 

@@ -9,6 +9,7 @@ namespace BlazorCitylife.Data
 {
     public class CitylifeDBService
     {
+        public Employee LoggedinUser;
         public Employee UserLoggedin(string userName, string password)
         {
             using(var db = new citylifedb8_blContext())
@@ -26,6 +27,7 @@ namespace BlazorCitylife.Data
                     }
                 }
                 //If we got here - we have an authenticated user
+                LoggedinUser = theEmployee;
                 return theEmployee;
             }
         }

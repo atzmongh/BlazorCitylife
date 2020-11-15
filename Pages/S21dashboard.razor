@@ -1,0 +1,608 @@
+﻿@using BlazorCitylife.Models
+@using BlazorCitylife.Data
+@page "/S21dashboard"
+@inject CitylifeDBService  cityLifeDB
+@inject NavigationManager NavigationManager;
+@{
+
+    Layout = "~/Views/sharing/_staffLayout.cshtml";
+    TranslateBox tBox = ViewBag.tBox;
+    DateTime fromDate = ViewBag.fromDate;
+    string fromDateSt = fromDate.ToString("dd/MM/yyyy");
+    DateTime today = ViewBag.today;
+    List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
+    List<Money> revenuePerDay = ViewBag.revenuePerDay;
+    List<Money> expensePerDay = ViewBag.expensePerDay;
+    List<string> expenseTypes = ViewBag.expenseTypes;
+    List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
+    List<double> aveargeDaysPerApartment = ViewBag.aveargeDaysPerApartment;
+    List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
+    EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
+    int highlightOrderId = ViewBag.highlightOrderId;
+    string wideDashboard = ViewBag.wideDashboard;   //contains either the word "checked" or empty
+    int dashboardDays = ViewBag.dashboardDays;
+    List<Employee> maidList = ViewBag.maidList;
+    string wide = "";
+    string high = "";
+    if (wideDashboard == "checked")
+    {
+        wide = "wide";
+        high = "high";
+    }
+    string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
+    int colorIndex = 0;
+}
+
+
+<link rel="stylesheet" href="~/css/dashboard.css" />
+<div class="main-wrapper reset-indent">
+    <form id="fromDateForm" method="get" action="s21Dashboard">
+        <div class="page-heading">
+
+            @tBox.translate("Dashboard")
+            <span>(@fromDateSt)</span>
+            <input type="checkbox" name="wideDashboard" onchange="$('#fromDateForm').submit()" @wideDashboard />Wide
+            <label for="datepickerBtn" class="datepicker-btn">
+                <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker"
+                       onchange="$('#fromDateForm').submit()">
+            </label>
+        </div>
+    </form>
+
+
+
+    <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
+    <div style="display:flex">
+        @*first column - apartment numbers, rev, expense and maid*@
+        <div class="dash01">
+            <table>
+                <tr><td class="dash01td">date</td></tr>
+                <tr><td class="dash01td">day</td></tr>
+                @foreach (var anApartment in apartmentDayBlocks)
+                {
+                    int apartmentNumber = anApartment.First().apartmentNumber;
+                    if (apartmentNumber > 0)
+                    {
+                        //this is a real apartment
+                        <tr><td class="dash01td @high">@apartmentNumber</td></tr>
+                    }
+                    else
+                    {
+                        //This is a "waiting" apartment
+                        <tr><td class="dash01td @high">Wt</td></tr>
+                    }
+
+                }
+                <tr><td>rev.</td></tr>
+                <tr><td>exp</td></tr>
+                <tr><td>maid</td></tr>
+            </table>
+        </div>
+        @*the table with all orders*@
+        <div class="dash02">
+            <table style="table-layout:fixed; width:100%">
+                @*line 1 - date line*@
+                <tr>
+                    @{ var lastDate = fromDate.AddDays(dashboardDays);}
+                    @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+                    {
+                        string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                        string weekendBackground = "";
+                        if (aDate.Date.DayOfWeek == DayOfWeek.Sunday || aDate.Date.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            //This is a weekend - highlight the column header in orange
+                            weekendBackground = "weekend";
+                        }
+
+                        <th class="dash02th @wide @weekendBackground @todaysBackground">@aDate.ToString("dd/MM")</th>
+                        <!--"wide" will make a wider column-->
+                    }
+                    <th class="dash02th"></th>
+                    <th class="dash02th"></th>
+                    <th class="dash02th"></th>
+                </tr>
+                @*line 2 - day line*@
+                <tr>
+                    @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+                    {
+                        string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                        <th class="dash02th @wide @todaysBackground">@aDate.ToString("ddd")</th>
+                    }
+                    <th class="dash02th">@tBox.translate("revenue")</th>
+                    <th class="dash02th">@tBox.translate("occ%")</th>
+                    <th class="dash02th">@tBox.translate("days")</th>
+                </tr>
+
+                @*line 3 and above - order lines (1 line for each apartment)*@
+                @{
+                    int apartmentI = 0;
+                    int realApartmentCount = 0;
+                    double totalOccupancyPercent = 0d;
+                    double totalDaysPerRent = 0d;
+
+                }
+                @foreach (var anApartment in apartmentDayBlocks)
+                {
+
+                    <tr style="background-color:@backgroundColors[colorIndex]">
+                        @{
+                            colorIndex++;
+                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
+                                                                     //of available colors
+                        }
+                        @foreach (var aDAyBlock in anApartment)
+                        {
+                            if (aDAyBlock.status == OrderStatus.Free)
+                            {
+                                //This is a free day
+                                <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
+                                    data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
+                            }
+                            else
+                            {
+                                //This is a busy day (or days)
+                                string line1;
+                                string line2;
+                                string line3 = "";
+                                if (wideDashboard == "checked")
+                                {
+                                    //This is a wide dashboard. Prepare the data that should be displayed on the order line
+                                    line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
+                                    line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
+                                    line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
+                                }
+                                else
+                                {
+                                    line1 = aDAyBlock.name;
+                                    line2 = aDAyBlock.price;
+                                }
+                                string color = aDAyBlock.orderColor.ToString();
+                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                <td class="dash02td @ @ @" colspan="@" data-order-id="@" id="@"
+                                    onclick="showOrder(this)">
+                                    @ <br /> @ <br />@
+                                </td>
+                                <td class="dash02td rightAlign">@</td>
+                                <td class="=dash02td rightAlign">@%</td>
+                                <td class="=dash02td rightAlign">@</td>
+                                @{}
+                            </tr>
+                            @*Revenu total line*@
+                            <tr>
+                                @{}
+                                @
+                                <td class="dash02td"></td>
+                                <td class="dash02td">@</td>
+                                @{}
+                                <td class="dash02td dash02total rightAlign">@</td>
+                                <td class="dash02td dash02total rightAlign">@%</td>
+                                <td class="dash02td dash02total rightAlign">@</td>
+                            </tr>
+                            @*Expense total line*@@{}
+                            <tr>
+                                @{}
+                                @
+                                <td class="dash02td selectCell" data-date='@' onclick="expenseClicked(this,false)"></td>
+                                <td class="dash02td selectCell" data-date='@' onclick="expenseClicked(this,true)">
+                                    @
+                                </td>
+                                <td class="dash02td dash02total rightAlign">@</td>
+                                <td class="dash02td rightAlign"></td>
+                                <td class="dash02td rightAlign"></td>
+                            </tr>
+                            @*Maid on duty line*@@{}
+                            <tr>
+                                @
+                                <td class="dash02td selectCell" onclick="displayMaidList(this)" data-emp-id="0"
+                                    data-date='@'></td>
+                                @*date-emp-id=0 denotes that an employee is not assigned to that day
+                                    date-date gives the date of the current cell*@
+                                <td class="dash02td @ selectCell" onclick="displayMaidList(this)"
+                                    data-emp-id="@"
+                                    data-date='@'>
+                                    @
+                                </td>
+                                <td class="dash02td dash02total rightAlign">@()</td>
+                                <td class="dash02td rightAlign"></td>
+                                <td class="dash02td rightAlign"></td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </div><div style="padding:2px;">@:@</div>
+                <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only
+                one is displayed and the rest are hidden-->
+                <div id="s20underTheGrid">
+                    <!--div for the order details info (when the user clicks on an existing order)-->
+                    <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
+
+
+                    </div>
+                    <!--div for info about new order dates (when the user clicks on an empty cell)-->
+                    <div id="newOrderDates" class="hidden">
+                        <span style="float:left">@</span>
+                        <span id="apartmentNumber" style="float:right"></span>
+                        <br />
+                        <span style="float:left">@</span>
+                        <span id="checkinDate" style="float:right"></span>
+                        <br />
+                        <span style="float:left">@</span>
+                        <span id="checkoutDate" style="float:right"></span>
+                        <br />
+                        <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@</a>
+
+                    </div>
+                    <!--div for the maid list (when the user clicks on a maid line)-->
+                    <div id="maidList" class="hidden">
+                        @<input type="radio" name="maid" value="@" data-maid-name="@" onclick="setMaid(this)" />@
+                        <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
+                    </div>
+
+
+                    <!--div for the "add expense" form (when clicking on an empty expense cell)-->
+                    <div id="addExpense" style="max-width:500px;" class="hidden">
+                        <form id="addExpenseForm" method="post">
+                            <div class='field-box datepicker-box'>
+                                <input type="text" id="expenseDate" name="expenseDate">
+                                <label for="expenseDate">
+                                    <span class="field-name">@</span>
+                                    <span class="calendar-ico"></span>
+                                </label>
+                                <span class="field-error"></span>
+                            </div>
+                            <div class='inputBox select-box'>
+                                <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
+                                <datalist id="expenseTypeList">
+                                    @
+                                    <option value="@">@</option>
+                                </datalist>
+                                <label for="expenseType" class="label">@</label>
+                                <span class="error-text"></span>
+                            </div>
+                            <div class="form-box-wrap">
+                                @
+                                <div class="field-box select-box">
+                                    <select id="currency" name="currency">
+                                        <option value="UAH" selected>UAH</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                    </select>
+                                    <label>
+                                        <span class="field-name">@</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-box-wrap">
+                                @
+
+                            </div>
+                            <input type="button" class="btn small-button" value='@' onclick="sendExpense(this)" />
+                            <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@</a>
+                            <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
+                        </form>
+                    </div>
+
+
+                    <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
+                    <div id="s30showExpenses">
+
+                    </div>
+
+                    <!--div for the update expense form-->
+                    <div id="s31updateExpense" style="max-width:550px;">
+
+                    </div>
+                </div>
+            </div>
+
+
+            @*<script>
+                    $(document).ready(initialize);
+
+                    function initialize() {
+                        //Initialize date picker
+                        $("#fromDate")
+                            .datepicker({
+                                defaultDate: "+0d",
+                                numberOfMonths: 1,
+                                dateFormat: "d MM, yy",
+                                firstDay: 1
+                            });
+                        $("#expenseDate")
+                            .datepicker({
+                                defaultDate: "+0d",
+                                numberOfMonths: 1,
+                                dateFormat: "dd/mm/yy",
+                                firstDay: 1
+                            });
+                        //highlight the default order (if it should be highlighted)
+                        var orderId = document.getElementById("highlightOrderId").dataset.orderId;
+                        if (orderId != 0) {
+                            var td = document.getElementById(orderId);
+                            showOrder(td);  //We do the same as if a user would click on an occupied cell.
+                        }
+
+                        //Initialize the currency dropdown in expense form
+
+                    }
+
+                    var lastSelectedTd = null;
+                    var lastSelectedLeft = null;
+                    var lastSelectedRight = null;
+                    var apartmentNumber = "0";
+                    var checkinDate = new Date();
+                    var checkoutDate = new Date();
+                    var nights = 0;
+                    var cellClickCounter = 0;
+
+
+                    //The function hides all forms under the grid except the one given in the parameter
+                    function hideAllExcept(div) {
+                        $("#s20underTheGrid").children().addClass("hidden");
+                        $(div).removeClass("hidden");
+                    }
+                    function showOrder(td) {
+                        // var orderId = td.dataset.orderId;
+                        if (lastSelectedTd != null) {
+                            $(lastSelectedTd).removeClass("highlight");
+                        }
+                        $(td).addClass("highlight");
+                        lastSelectedTd = td;
+                        var orderIdJson = { orderId: td.dataset.orderId };
+                        $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
+                    }
+
+                    function displayOrderDetails(orderDetailsHTML) {
+                        hideAllExcept("#s22OrderDetails");
+                        $("#s22OrderDetails").html(orderDetailsHTML);
+                    }
+
+
+
+                    function addOrder(td) {
+                        cellClickCounter++;
+                        if (lastSelectedTd != null) {
+                            //remove highlighting from a previous booking that was selected
+                            $(lastSelectedTd).removeClass("highlight");
+                            lastSelectedTd = null;
+                        }
+                        if (cellClickCounter % 2 == 1) {
+                            //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
+                            //We assume a one night stay
+                            if (lastSelectedLeft != null) {
+                                $(lastSelectedLeft).removeClass("selectedLeft");
+                            }
+                            if (lastSelectedRight != null) {
+                                $(lastSelectedRight).removeClass("selectedRight");
+                            }
+                            $(td).addClass("selectedLeft");
+                            lastSelectedLeft = td;
+                            apartmentNumber = td.dataset.apartmentId;
+                            checkinDate = new Date(td.dataset.date);
+                            nights = 1;
+                            var checkoutDate = nextDate(checkinDate);
+                            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
+                        }
+                        else {
+                            //The user clicked even number of times on a cell = collect the checkout date. Note that the user presses the
+                            //last date - not the checkout date (which is one day later.)
+                            var secondApartmentNumber = td.dataset.apartmentId;
+                            if (apartmentNumber != secondApartmentNumber) {
+                                //The second click was for a different apartment number - start the process again.
+                                //perform this by a recursive call to addOrder
+                                addOrder(td);
+                                return;
+                            }
+                            $(td).addClass("selectedRight");
+                            lastSelectedRight = td;
+                            lastDate = new Date(td.dataset.date);
+                            checkoutDate = nextDate(lastDate);
+                            nights = diffDays(checkinDate, checkoutDate);
+                            if (nights <= 0) {
+                                //The second click was for a day before the first click - reverse the checkin and checkout dates
+                                //We do it by a recursive call to "addOrder"
+                                var leftTD = lastSelectedRight;
+                                var rightTD = lastSelectedLeft;
+                                addOrder(leftTD);
+                                addOrder(rightTD);
+                                return;
+                            }
+
+                            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
+                        }
+                    }
+                    //convert a Date object to dd/mm/yyyy
+                    function formatDateddmmyyyy(aDate) {
+                        var day = aDate.getDate();
+                        var zeroDay = day <= 9 ? "0" : "";
+                        var month = aDate.getMonth() + 1;
+                        var zeroMonth = month <= 9 ? "0" : "";
+                        var ddmmyyyy = zeroDay + day + "/" + zeroMonth + month + "/" + aDate.getFullYear();   //create the string dd/mm/yyyy. Note that dd and mm will always have 2 digits
+                        return ddmmyyyy;
+                    }
+                    //convert a Date object to yyyy-mm-dd
+                    function formatDateyyyymmdd(aDate) {
+                        var day = aDate.getDate();
+                        var zeroDay = day <= 9 ? "0" : "";
+                        var month = aDate.getMonth() + 1;
+                        var zeroMonth = month <= 9 ? "0" : "";
+                        var yyyymmdd = aDate.getFullYear() + "-" + zeroMonth + month + "-" + zeroDay + day;
+                        return yyyymmdd;
+                    }
+                    //returns a date which is 1 day later
+                    function nextDate(aDate) {
+                        var nextDate = new Date(aDate);
+                        var nextDay = aDate.getDate() + 1;
+                        nextDate.setDate(nextDay);
+                        return nextDate;
+                    }
+
+                    function displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights) {
+                        var html = '<div>' +
+                                '<span style="float:left">@tBox.translate("Apartment Number")</span>' +
+                                '<span id="apartmentNumber" style="float:right">' + apartmentNumber + '</span>' +
+                                '<br />' +
+                                '<span style="float:left">@tBox.translate("Checkin Date")</span>' +
+                                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkinDate) + '</span>' +
+                                '<br />' +
+                                '<span style="float:left">@tBox.translate("Checkout Date")</span>' +
+                                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkoutDate) + '</span>' +
+                                '<br />' +
+                                '<span style="float:left">@tBox.translate("nights")</span>' +
+                                '<span id="checkinDate" style="float:right">' + nights + '</span>' +
+                            '<br />' +
+                            '<a class="btn" href="/staff/s24addOrder?checkin=' + formatDateyyyymmdd(checkinDate) +
+                            '&checkout=' + formatDateyyyymmdd(checkoutDate) +
+                            '&nights=' + nights +
+                            '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
+                                '</div>';
+
+                        hideAllExcept("#s22OrderDetails");
+                        $("#s22OrderDetails").html(html);
+                    }
+
+                    //returns the difference between d1 and d2 (actually d2 minus d1)
+                    function diffDays(d1, d2) {
+                        var ndays;
+                        var tv1 = d1.getTime();  // msec since 1970
+                        var tv2 = d2.getTime();
+
+                        ndays = (tv2 - tv1) / 1000 / 86400;
+                        ndays = Math.round(ndays - 0.5);
+                        return ndays;
+                    }
+
+                    var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no
+                    function displayMaidList(tdEmp) {
+
+                        $(tdMaid).removeClass("highlight");   //If tdMaid is null - the command is ignored.
+                        $(tdExp) .removeClass("highlight");
+
+                        $(tdEmp).addClass("highlight");
+                        tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
+                        //know to which cell it was related
+                        hideAllExcept("#maidList");
+                    }
+
+                    //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user
+                    //(and kept in "tdMaid")
+                    function setMaid(maidRadio) {
+                        $(tdMaid).text(maidRadio.dataset.maidName);
+                        var maidDay = new Object();
+                        maidDay.maidId = maidRadio.value;
+                        maidDay.date = tdMaid.dataset.date;
+                        $.post("/staff/s28AddUpdateMaid", maidDay);
+                    }
+
+                    //The function is called when an expense cell is clicked.
+                    //param 1: the cell clicked
+                    //param 2: whether the expense cell contained an expense or not.
+                    var tdExp = null;
+                    function expenseClicked(tdExpense, expenseIsPositive) {
+                        var expenseDate = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
+                        var theDate = new Date(expenseDate);
+                        var ddmmyyyy = formatDateddmmyyyy(theDate);
+                        $("#expenseDate").val(ddmmyyyy);
+                        tdExpense.text
+
+                        //Clean all other pieces of information which may exist under the grid
+                        $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
+                        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell
+                        $(tdExpense).addClass("highlight");
+                        tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
+                        //know to which cell it was related
+                        if (tdExpense.innerText != "") {
+                            //the cell contains expenses - show a table with a list of expenses for that day
+                            var expenseDateParam = new Object();
+                            expenseDateParam.expenseDateSt = expenseDate;
+                            $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
+
+                        }
+                        else {
+                            //There are no expenses for that day - show the "add class" form
+                            hideAllExcept("#addExpense");
+                        }
+                    }
+
+                    function showExpenseList(expenseListHTML) {
+                        hideAllExcept("#s30showExpenses");
+                        $("#s30showExpenses").html(expenseListHTML);
+                    }
+                    //perform ajax call to send the expense form to the backend - staff controller s29addExpense
+                    function sendExpense() {
+                        var formParams = $("#addExpenseForm").serialize();
+                        $.post("/staff/s29addExpense", formParams,expenseAdded);
+                    }
+
+                    //get response from staff controller s29addExpense. The callback returns the total amount of expenses for that day after adding the new expense.
+                    function expenseAdded(totalExpenseForDay) {
+                        $(tdExp).text(totalExpenseForDay);
+                        $("#expenseType").val("");
+                        $("#amount").val("");
+                        $("#description").val("");
+                        $("#expenseAddedMessage").fadeIn(1000, () => $("#expenseAddedMessage").fadeOut(1000));
+
+                    }
+                    //the function is called by on click in s30showExpenses
+                    function addExpense() {
+                        hideAllExcept("#addExpense");
+                    }
+
+                    //The function is called by on click in s30showExpenses (for each expense line)
+                    function updateExpense(expenseId) {
+                        var expense = new Object();
+                        expense.expenseId = expenseId;
+                        $.get("/staff/s31updateExpense", expense, showUpdateForm);
+                    }
+                    function showUpdateForm(updateForm) {
+                        hideAllExcept("#s31updateExpense");
+                        $("#s31updateExpense").html(updateForm);
+                        $("#currency2").select2({
+                            minimumResultsForSearch: Infinity
+                        });
+                        var expenseDate = $("#expenseDate2");
+                        expenseDate.datepicker({
+                           // defaultDate: "5 Feb 2019",
+                            numberOfMonths: 1,
+                            dateFormat: "dd/mm/yy",
+                            firstDay: 1
+                        });
+                    }
+
+                    function expenseUpdating(btn) {
+                        var formParams = $("#updateExpenseForm").serialize();
+                        $.post("/staff/s31updateExpense", formParams, expenseUpdated);
+
+                    }
+
+                    function expenseUpdated(totalExpenseForDay) {
+                        $(tdExp).text(totalExpenseForDay);
+                        $("#expenseUpdatedMessage").fadeIn(1000, () => $("#expenseUpdatedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
+                    }
+
+                    function expenseDeleting(btn) {
+                        var expenseId = $("#expenseId").val();
+                        var formParams = new Object();
+                        formParams.expenseId = expenseId;
+                        $.post("/staff/s32deleteExpense", formParams, expenseDeleted);
+                    }
+
+                    function expenseDeleted(totalExpenseForDay) {
+                        $(tdExp).text(totalExpenseForDay);
+                        $("#expenseDeletedMessage").fadeIn(1000, () => $("#expenseDeletedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
+                    }
+                </script>*@
+
+            @code
+{
+protected override void OnInitialized()
+    {
+        if (cityLifeDB.LoggedinUser == null)
+        {
+            NavigationManager.NavigateTo("s10login");
+        }
+
+        base.OnInitialized();
+    }
+            }

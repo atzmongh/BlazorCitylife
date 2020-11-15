@@ -2,14 +2,8 @@
 @using BlazorCitylife.Data
 @page "/S10login"
 @inject CitylifeDBService  cityLifeDB
-@{
-    string loggedUserName = "none";
-    if (cityLifeDB.LoggedinUser != null)
-    {
-        loggedUserName = cityLifeDB.LoggedinUser.Name;
-    }
-}
-<h3>Login: @loggedUserName </h3>
+
+<h3>Login</h3>
 
 
 <div class="container" style="max-width:400px;">
@@ -75,7 +69,7 @@
                 passwordValidity = "";
             }
         }
-
+        cityLifeDB.NavMenuComponent.ReRender();  //We want to show the logged in user in the top of the nav menu
     }
 
 }

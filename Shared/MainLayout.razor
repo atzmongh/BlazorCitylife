@@ -1,7 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using BlazorCitylife.Models
+@using BlazorCitylife.Data
+@inject CitylifeDBService  cityLifeDB
 
 <div class="sidebar">
-    <NavMenu />
+    <NavMenu/>
 </div>
 
 <div class="main">
@@ -13,3 +16,4 @@
         @Body
     </div>
 </div>
+

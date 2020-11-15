@@ -1,9 +1,18 @@
 ﻿@using BlazorCitylife.Models
 @using BlazorCitylife.Data
 @inject CitylifeDBService  cityLifeDB
+@inject NavigationManager NavigationManager
 <div class="top-row pl-4 navbar navbar-dark">
-    
-    <a class="navbar-brand" href="">Citylife Blazor</a>
+
+    @if (cityLifeDB.UserIsLoggedin)
+    {
+        <a class="navbar-brand" href="">@cityLifeDB.UserName</a>
+        <btn class="navbar-brand" style="cursor:pointer" @onclick="LogoutClicked">Logout</btn>
+    }
+    else
+    {
+        <a class="navbar-brand" href="/S10login">Login</a>
+    }
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -42,5 +51,19 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    protected override void OnInitialized()
+    {
+        cityLifeDB.NavMenuComponent = this;
+        base.OnInitialized();
+    }
+    public void ReRender()
+    {
+        this.StateHasChanged();
+    }
+    public void LogoutClicked()
+    {
+        cityLifeDB.LoggedinUser = null;
+        NavigationManager.NavigateTo("S10login");
     }
 }

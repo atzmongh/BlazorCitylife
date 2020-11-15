@@ -12,8 +12,8 @@ namespace BlazorCitylife.Data
     public class CitylifeDBService
     {
         public Employee LoggedinUser;
-        public  NavMenu NavMenuComponent;
-        private DateTime? FromDate;
+        public NavMenu NavMenuComponent;
+        public DateTime FromDate = FakeDateTime.DateNow.AddDays(-1);
         public bool UserIsLoggedin => LoggedinUser != null;
         public string UserName => UserIsLoggedin ? LoggedinUser.UserName : "";
        
@@ -45,27 +45,9 @@ namespace BlazorCitylife.Data
         /// In this mode, each column is wider (about 4 normal columns), we show only 3 days, and we put more data into\
         /// each order element.</param>
         /// <returns></returns>
-        public void s21Dashboard(DateTime? fromDate, string wideDashboard = "off")
+        public void s21Dashboard(DateTime startDate, string wideDashboard = "off")
         {
-            DateTime startDate;
-            if (fromDate == null && this.FromDate == null)
-            {
-                //Take yesterda's date as default
-                startDate = FakeDateTime.DateNow.AddDays(-1);
-                FromDate = startDate;
-            }
-            else if (fromDate == null)
-            {
-                //fromDate is null but we have a date in the session - take it
-                startDate = (DateTime)FromDate;
-            }
-            else
-            {
-                //We have a date in "fromDate" - save it in the session variable
-                startDate = (DateTime)fromDate;
-                this.FromDate = startDate;
-            }
-            //At this point startDate contains a date (and also this.FromDate - contains the same date
+            this.FromDate = startDate;
 
             //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
             //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month. 
@@ -100,23 +82,7 @@ namespace BlazorCitylife.Data
                     ref percentOccupancyPerApartment,
                     ref empWorkDaysArray,
                     ref maidList);
-                ViewBag.apartmentDayBlocks = apartmentDayBlocks;
-                ViewBag.revenuePerDay = revenuePerDay;
-                ViewBag.expensePerDay = expensePerDay;
-                ViewBag.expenseTypes = expenseTypes;
-                ViewBag.revenuPerApartment = revenuePerApartment;
-                ViewBag.aveargeDaysPerApartment = aveargeDaysPerApartment;
-                ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
-                ViewBag.empWorkDaysArray = empWorkDaysArray;
-                TranslateBox tBox = this.setTbox("RU");
-                ViewBag.tBox = tBox;
-                ViewBag.fromDate = startDate;
-                ViewBag.today = FakeDateTime.Now;
-                ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
-                ViewBag.dashboardDays = dashboardDays;
-                ViewBag.maidList = maidList;
 
-                ViewBag.employee = theEmployee;
                 if (Session["lastOrderDetails"] != null)
                 {
                     ViewBag.highlightOrderId = (int)Session["lastOrderDetails"];

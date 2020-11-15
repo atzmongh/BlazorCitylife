@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorCitylife.Data;
+using CityLife;
 
 namespace BlazorCitylife
 {
@@ -30,6 +31,7 @@ namespace BlazorCitylife
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<CitylifeDBService>();
+            services.AddSingleton<TranslateBox>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

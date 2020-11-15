@@ -19,6 +19,17 @@ namespace BlazorCitylife.Models
         DESKTOP,
         ANY
     }
+    public enum OrientationType : short
+    {
+        Landscape = 0,
+        Portrait = 1
+    }
+    public enum PhotoType : short
+    {
+        Main = 0,
+        Additional = 1,
+        Thumbnail = 2
+    }
     public partial class Apartment
     {
         /// <summary>
@@ -86,15 +97,15 @@ namespace BlazorCitylife.Models
             {
                 theMainPhoto = new ApartmentPhoto()
                 {
-                    filePath = "/images/missing landscape photo.png",
-                    orientation = OrientationType.Landscape,
-                    type = PhotoType.Main
+                    FilePath = "/images/missing landscape photo.png",
+                    Orientation = (short)OrientationType.Landscape,
+                    Type = (short)PhotoType.Main
                 };
             }
             else
             {
-                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                            aPhoto.orientation == OrientationType.Landscape);
+                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.Type == (short)PhotoType.Main &&
+                                                                            aPhoto.Orientation == (short)OrientationType.Landscape);
             }
             return theMainPhoto;
         }
@@ -110,17 +121,17 @@ namespace BlazorCitylife.Models
             {
                 theMainPhoto = new ApartmentPhoto()
                 {
-                    filePath = "/images/missing portrait photo.jpg",
-                    orientation = OrientationType.Portrait,
-                    type = PhotoType.Main
+                    FilePath = "/images/missing portrait photo.jpg",
+                    Orientation = (short)OrientationType.Portrait,
+                    Type = (short)PhotoType.Main
                 };
                 //theMainPhoto = this.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing portrait photo.jpg"); ;
             }
             else
             {
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                theMainPhoto = db.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                            aPhoto.orientation == OrientationType.Portrait);
+                citylifedb8_blContext db = new citylifedb8_blContext();
+                theMainPhoto = db.ApartmentPhoto.FirstOrDefault(aPhoto => aPhoto.Type == (short)PhotoType.Main &&
+                                                                            aPhoto.Orientation == (short)OrientationType.Portrait);
             }
             return theMainPhoto;
         }
@@ -131,15 +142,15 @@ namespace BlazorCitylife.Models
             {
                 theMainPhoto = new ApartmentPhoto()
                 {
-                    filePath = "/images/missing landscape photo.jpg",
-                    orientation = OrientationType.Landscape,
-                    type = PhotoType.Main
+                    FilePath = "/images/missing landscape photo.jpg",
+                    Orientation = (short)OrientationType.Landscape,
+                    Type = (short)PhotoType.Main
                 };
             }
             else if (preferredDevice == DisplayDevice.ANY)
             {
                 //Find any main photo, regardless of device
-                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main);
+                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.Type == (short)PhotoType.Main);
 
             }
             else
@@ -147,14 +158,14 @@ namespace BlazorCitylife.Models
                 //Find main photo for the preferred device
                 if (preferredDevice == DisplayDevice.DESKTOP)
                 {
-                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                                 aPhoto.forDesktop == true);
+                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.Type == (short)PhotoType.Main &&
+                                                                                 aPhoto.ForDesktop == true);
                 }
                 else
                 {
                     //Find preferred main photo for mobile
-                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                                 aPhoto.forMobile == true);
+                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.Type == (short)PhotoType.Main &&
+                                                                                 aPhoto.ForMobile == true);
                 }
 
             }
@@ -175,11 +186,11 @@ namespace BlazorCitylife.Models
             }
             else if (prefferedDevice == DisplayDevice.MOBILE)
             {
-                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.forMobile == true);
+                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.ForMobile == true);
             }
             else
             {
-                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.forDesktop == true);
+                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.ForDesktop == true);
             }
             return thePhotos;
         }
@@ -191,7 +202,7 @@ namespace BlazorCitylife.Models
         /// <returns></returns>
         public List<string> featureKeyList()
         {
-            List<string> featureList = this.featuresKeys.Split(';').ToList();
+            List<string> featureList = this.FeaturesKeys.Split(';').ToList();
             return featureList;
         }
 
@@ -202,7 +213,7 @@ namespace BlazorCitylife.Models
         /// <returns></returns>
         public List<string> descriptionKeyList()
         {
-            List<string> descriptionList = this.descriptionKey.Split(';').ToList();
+            List<string> descriptionList = this.DescriptionKey.Split(';').ToList();
             return descriptionList;
         }
     }

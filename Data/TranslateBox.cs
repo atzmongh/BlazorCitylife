@@ -31,7 +31,7 @@ namespace CityLife
         /// - otherwise - return the translation key without asterisks.
         /// The first option is for QA, the second option is for production
         /// </param>
-        public TranslateBox(string targetLanguageCode, string defaultLanguageCode, string noTranslation )
+        public void Init(string targetLanguageCode, string defaultLanguageCode, string noTranslation )
         {
             _targetLanguageCode = targetLanguageCode;
             _defaultLanguageCode = defaultLanguageCode;
@@ -42,13 +42,16 @@ namespace CityLife
         {
             set
             {
-                citylifedb8_blContext db = new citylifedb8_blContext();
-                if (db.Language.Find(value) == null)
+                using (citylifedb8_blContext db = new citylifedb8_blContext())
                 {
-                    //such language code does not exist in the language table
-                    throw new AppException(106, null, "an unsupported language requested:" + value);
+                    if (db.Language.Find(value) == null)
+                    {
+                        //such language code does not exist in the language table
+                        throw new AppException(106, null, "an unsupported language requested:" + value);
+                    }
+                    _targetLanguageCode = value;
                 }
-                _targetLanguageCode = value;
+                    
         }
             get { return _targetLanguageCode; }
         }
@@ -73,72 +76,74 @@ namespace CityLife
                 AppException.writeException(120, null, Environment.StackTrace);
                 return "";
             }
-            citylifedb8_blContext db = new citylifedb8_blContext();
-            TranslationKey theTranslationKey =  db.TranslationKey.SingleOrDefault(record => record.TransKey == translationKey);
-            if (theTranslationKey==null)
+            using (citylifedb8_blContext db = new citylifedb8_blContext())
             {
-                //the translation key does not exist. Add it to the translation key table and add the
-                //same text to the translation text as English text
-                theTranslationKey = new TranslationKey() { TransKey = translationKey, IsUsed = true, FilePath = filePath, LineNumber = lineNumber };
-                db.TranslationKey.Add(theTranslationKey);
-                db.SaveChanges();
-                Language english = db.Language.Single(a => a.LanguageCode == "EN");
-                Translation theEnglishTranslation = new Translation() { LanguageLanguageCode = english.LanguageCode, TranslationKey = theTranslationKey, Message = translationKey };
-                db.Translation.Add(theEnglishTranslation);
-                db.SaveChanges();
-                if (_noTranslation == "showAsterisks")
+                TranslationKey theTranslationKey = db.TranslationKey.SingleOrDefault(record => record.TransKey == translationKey);
+                if (theTranslationKey == null)
                 {
-                    //return the translation key surrounded by asterisks for QA
-                    string translated = '*' + translationKey + '*';
-                    return translated;
-                }
-                else
-                {
-                    //assuming "defaultLanguage" - but since there is no translation at all for this key - return the key without asterisks
-                    return translationKey;
-                }
-            }
-            else
-            {
-                //The translation key exists -
-                if (theTranslationKey.LineNumber != lineNumber || theTranslationKey.FilePath != filePath)
-                {
-                    //The file path or the line number where the call was performed has changed. Assuming it is because we added some lines of
-                    //code, or refactored the code - update the file path tne line number
-                    theTranslationKey.LineNumber = lineNumber;
-                    theTranslationKey.FilePath = filePath;
+                    //the translation key does not exist. Add it to the translation key table and add the
+                    //same text to the translation text as English text
+                    theTranslationKey = new TranslationKey() { TransKey = translationKey, IsUsed = true, FilePath = filePath, LineNumber = lineNumber };
+                    db.TranslationKey.Add(theTranslationKey);
                     db.SaveChanges();
-                }
-                //check if we have translation in the desired language
-                Translation theTranslation = db.Translation.SingleOrDefault(record => record.TranslationKey.Id == theTranslationKey.Id && 
-                                                                                     record.LanguageLanguageCode == _targetLanguageCode);
-                if (theTranslation != null)
-                {
-                    //the translation exists in the target language - return it
-                    return theTranslation.Message;
-                }
-                else
-                {
-                    //The translation does not exist in the target language
+                    Language english = db.Language.Single(a => a.LanguageCode == "EN");
+                    Translation theEnglishTranslation = new Translation() { LanguageLanguageCode = english.LanguageCode, TranslationKey = theTranslationKey, Message = translationKey };
+                    db.Translation.Add(theEnglishTranslation);
+                    db.SaveChanges();
                     if (_noTranslation == "showAsterisks")
                     {
-                        //In this case we need to return the translation key with asterisks
-                        return '*' + translationKey + '*';
+                        //return the translation key surrounded by asterisks for QA
+                        string translated = '*' + translationKey + '*';
+                        return translated;
                     }
                     else
                     {
-                        //assuming _noTranslation is "defaultLanguage" - look for translation in the default language
-                        theTranslation = db.Translation.SingleOrDefault(record => record.TranslationKey.Id == theTranslationKey.Id &&
-                                                                                 record.LanguageLanguageCode == _defaultLanguageCode);
-                        if (theTranslation != null)
+                        //assuming "defaultLanguage" - but since there is no translation at all for this key - return the key without asterisks
+                        return translationKey;
+                    }
+                }
+                else
+                {
+                    //The translation key exists -
+                    if (theTranslationKey.LineNumber != lineNumber || theTranslationKey.FilePath != filePath)
+                    {
+                        //The file path or the line number where the call was performed has changed. Assuming it is because we added some lines of
+                        //code, or refactored the code - update the file path tne line number
+                        theTranslationKey.LineNumber = lineNumber;
+                        theTranslationKey.FilePath = filePath;
+                        db.SaveChanges();
+                    }
+                    //check if we have translation in the desired language
+                    Translation theTranslation = db.Translation.SingleOrDefault(record => record.TranslationKey.Id == theTranslationKey.Id &&
+                                                                                         record.LanguageLanguageCode == _targetLanguageCode);
+                    if (theTranslation != null)
+                    {
+                        //the translation exists in the target language - return it
+                        return theTranslation.Message;
+                    }
+                    else
+                    {
+                        //The translation does not exist in the target language
+                        if (_noTranslation == "showAsterisks")
                         {
-                            //translation exists - return it
-                            return theTranslation.Message;
+                            //In this case we need to return the translation key with asterisks
+                            return '*' + translationKey + '*';
                         }
                         else
                         {
-                            //no translation exists even in the default language - return the translation key (without asterisks)
-                            return translationKey;
+                            //assuming _noTranslation is "defaultLanguage" - look for translation in the default language
+                            theTranslation = db.Translation.SingleOrDefault(record => record.TranslationKey.Id == theTranslationKey.Id &&
+                                                                                     record.LanguageLanguageCode == _defaultLanguageCode);
+                            if (theTranslation != null)
+                            {
+                                //translation exists - return it
+                                return theTranslation.Message;
+                            }
+                            else
+                            {
+                                //no translation exists even in the default language - return the translation key (without asterisks)
+                                return translationKey;
+                            }
                         }
                     }
                 }

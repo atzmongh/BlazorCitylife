@@ -44,10 +44,9 @@
 
             @tBox.translate("Dashboard")
             <span>(@cityLifeDB.FromDate.ToShortDateString())</span>
-            <input type="checkbox" name="wideDashboard" checked="@wideDashboard" @onchange="wideClicked" />Wide
+            <input type="checkbox" name="wideDashboard" checked="@wideDashboard" @onchange="WideClicked" />Wide
             <label for="datepickerBtn" class="datepicker-btn">
-                <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker"
-                       onchange="$('#fromDateForm').submit()">
+                <input type="date" id="datepickerBtn" name="fromDate" @bind="@fromDate">
             </label>
         </div>
     </form>
@@ -290,7 +289,16 @@
     List<double> aveargeDaysPerApartment = null;
     List<int> percentOccupancyPerApartment = null;
     List<List<DayBlock>> apartmentDayBlocks;
-    DateTime fromDate;
+    private DateTime _fromDate;
+    DateTime fromDate
+    {
+        get { return _fromDate; }
+        set
+        {
+            _fromDate = value;
+            GetDashboardData(_fromDate);
+        }
+    }
     int dashboardDays;
     DateTime today = FakeDateTime.Now;
     string wideDashboard = "";   //or "checked";
@@ -304,11 +312,10 @@
     {
         if (cityLifeDB.LoggedinUser == null)
         {
-            NavigationManager.NavigateTo("s10login");
+            NavigationManager.NavigateTo("/s10login");
         }
         fromDate = cityLifeDB.FromDate;
-        GetDashboardData(fromDate);
-
+        tBox.Init("ru", "en", "showAsterisk");
 
         base.OnInitialized();
     }
@@ -326,7 +333,7 @@
         //             1/11/2019     30/11/2019
         //             1/12/2019     31/12/2019
         //             1/2/2020      29/2/2020 (2020 is leap year)
-        dashboardDays = FakeDateTime.monthLength(cityLifeDB.FromDate);
+        dashboardDays = FakeDateTime.monthLength(startDate);
 
 
 
@@ -344,7 +351,7 @@
 
     }
 
-    public void wideClicked(ChangeEventArgs e)
+    public void WideClicked(ChangeEventArgs e)
     {
         if ((bool)e.Value)
         {

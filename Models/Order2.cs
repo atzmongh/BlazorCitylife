@@ -10,7 +10,7 @@ namespace BlazorCitylife.Models
     {
         public bool isFirstDay(DateTime aDate)
         {
-            return this.checkinDate == aDate;
+            return this.CheckinDate == aDate;
         }
         /// <summary>
         /// Last day is the day before the checkout date. For example: if the guest checked in on 1/12/2019 and checkout on 4/12/2019

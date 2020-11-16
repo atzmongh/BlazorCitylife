@@ -260,7 +260,7 @@ namespace CityLife
                                     where anExchangeRate.FromCurrencyCurrencyCode == lowerCurrencyCode &&
                                           anExchangeRate.ToCurrencyCurrencyCode    == upperCurrencyCOde  &&
                                           anExchangeRate.Date <= atDate
-                                    orderby anExchangeRate.date descending
+                                    orderby anExchangeRate.Date descending
                                     select anExchangeRate;
                 if (exchangeRates.Count() == 0)
                 {
@@ -269,13 +269,13 @@ namespace CityLife
                 }
                 var theExchangeRate = exchangeRates.First();  //take the latest record which is still before or at the requested date
                 decimal result;
-                if (theExchangeRate.FromCurrency.currencyCode == this.currencyCode)
+                if (theExchangeRate.FromCurrencyCurrencyCode == this.currencyCode)
                 {
-                    result = this.amount * theExchangeRate.conversionRate;
+                    result = this.amount * theExchangeRate.ConversionRate;
                 }
                 else
                 {
-                    result = this.amount / theExchangeRate.conversionRate;
+                    result = this.amount / theExchangeRate.ConversionRate;
                 }
                 if (rounded)
                 {

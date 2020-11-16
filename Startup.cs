@@ -31,7 +31,7 @@ namespace BlazorCitylife
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<CitylifeDBService>();
-            services.AddSingleton<TranslateBox>();
+            services.AddScoped<TranslateBox>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

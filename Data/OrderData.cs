@@ -184,7 +184,7 @@ namespace BlazorCitylife.Data
             {
                 //Cuntry is not empty - check that it exists in our DB
                 citylifedb8_blContext db = new citylifedb8_blContext();
-                Country theCountry = db.Country.SingleOrDefault(a => a.name == this.country);
+                Country theCountry = db.Country.SingleOrDefault(a => a.Name == this.country);
                 if (theCountry == null)
                 {
                     //Although we do not expect such a case, as our country list contains all countries, and the user can only choose from the list

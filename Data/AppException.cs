@@ -1,4 +1,4 @@
-﻿
+﻿using BlazorCitylife.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -68,46 +68,46 @@ namespace CityLife
 
         public static void writeException(int code, Exception innerException, string stackTrace, params object[] parameters)
         {
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            ErrorCode theErrorCode = db.ErrorCodes.SingleOrDefault(aRecord => aRecord.code == code);
+            citylifedb8_blContext db = new citylifedb8_blContext();
+            ErrorCode theErrorCode = db.ErrorCode.SingleOrDefault(aRecord => aRecord.Code == code);
             if (theErrorCode != null)
             {
                 //This error code already exists in the DB. 
-                theErrorCode.lastOccurenceDate = DateTime.Now;
-                theErrorCode.occurenceCount++;
+                theErrorCode.LastOccurenceDate = DateTime.Now;
+                theErrorCode.OccurenceCount++;
             }
             else
             {
                 //The error code does not exist - create it
-                theErrorCode = new ErrorCode() { code = code, message = ErrorCodeCollection.message(code),
-                                                 lastOccurenceDate = DateTime.Now, occurenceCount = 1 };
-                db.ErrorCodes.Add(theErrorCode);
+                theErrorCode = new ErrorCode() { Code = code, Message = ErrorCodeCollection.message(code),
+                                                 LastOccurenceDate = DateTime.Now, OccurenceCount = 1 };
+                db.ErrorCode.Add(theErrorCode);
             }
             db.SaveChanges();
             //check if the same error message exists in the error message table
             string formattedMessage = AppException.formatMessage(code, parameters);
             ErrorMessage theErrorMessage = (from anErrorMessage in theErrorCode.ErrorMessages
-                                            where anErrorMessage.formattedMessage == formattedMessage &&
-                                                  anErrorMessage.stackTrace == stackTrace
+                                            where anErrorMessage.FormattedMessage == formattedMessage &&
+                                                  anErrorMessage.StackTrace == stackTrace
                                             select anErrorMessage).FirstOrDefault();  //actually we expect only a single record to be found
             if (theErrorMessage != null)
             {
                 //Such an exact error message already exists - increment the counter
-                theErrorMessage.lastOccurenceDate = DateTime.Now;
-                theErrorMessage.occurenceCount++;
+                theErrorMessage.LastOccurenceDate = DateTime.Now;
+                theErrorMessage.OccurenceCount++;
             }
             else
             {
                 //such exact error message does not exist - add it
                 theErrorMessage = new ErrorMessage()
                 {
-                   ErrorCode = theErrorCode,
-                    formattedMessage = formattedMessage,
-                    lastOccurenceDate = DateTime.Now,
-                    occurenceCount = 1,
-                    stackTrace = stackTrace,
+                   ErrorCodeCode = theErrorCode.Code,
+                    FormattedMessage = formattedMessage,
+                    LastOccurenceDate = DateTime.Now,
+                    OccurenceCount = 1,
+                    StackTrace = stackTrace,
                 };
-                db.ErrorMessages.Add(theErrorMessage);
+                db.ErrorMessage.Add(theErrorMessage);
             }
             db.SaveChanges();
 

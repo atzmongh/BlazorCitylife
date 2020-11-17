@@ -236,10 +236,11 @@ namespace BlazorCitylife.Data
                         else
                         {
                             //this is a busy day. Read the order record
-                            if (anOrder.Id != anApartmentDay.Order.Id)
+                            if (anOrder.Id != anApartmentDay.OrderId)
                             {
                                 //We did not read this order yet - read it
-                                anOrder = db.Order.Single(record => record.Id == anApartmentDay.Order.Id);
+                                anOrder = db.Order.Find(anApartmentDay.OrderId);
+                               // anOrder = db.Order.Single(record => record.Id == anApartmentDay.Order.Id);
                                 //Check if this order started today
                                 if (anOrder.CheckinDate == aDate)
                                 {

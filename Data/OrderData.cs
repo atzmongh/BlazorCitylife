@@ -111,18 +111,18 @@ namespace BlazorCitylife.Data
         public OrderData(Order anOrder)
         {
             orderId = anOrder.Id;
-            name = anOrder.Guest.Name;
-            phone = anOrder.Guest.Phone;
-            email = anOrder.Guest.Email;
-            Country guestCountry = anOrder.Guest.CountryCodeNavigation;
-            if (guestCountry == null)
+            using (citylifedb8_blContext db = new citylifedb8_blContext())
             {
-                country = null;
+                Guest theGuest = db.Guest.Find(anOrder.GuestId);
+                name = theGuest?.Name;
+                phone = theGuest?.Phone;
+                email = theGuest?.Email;
+                Country guestCountry = theGuest?.CountryCodeNavigation;
+                country = guestCountry?.Name;
+                Apartment theApartment = db.Apartment.Find(anOrder.ApartmentId);
+                apartmentNumber = theApartment?.Number??0;  //if an apartment was not found - put 0 (although not expected)
             }
-            else
-            {
-                country = guestCountry.Name;
-            }
+            
             adults = anOrder.AdultCount;
             children = anOrder.ChildrenCount;
             checkin = anOrder.CheckinDate;
@@ -138,7 +138,6 @@ namespace BlazorCitylife.Data
             expectedArrival = anOrder.ExpectedArrival;
             comments = anOrder.SpecialRequest;
             bookedBy = anOrder.BookedBy;
-            apartmentNumber = anOrder.Apartment.Number;
             confirmationNumber = anOrder.ConfirmationNumber;
             status = (OrderStatus)anOrder.Status;
             orderColor = (Color)anOrder.OrderColor;

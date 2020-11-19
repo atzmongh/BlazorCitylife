@@ -96,3 +96,7 @@ C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\staticwebassets\BlazorCit
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\BlazorCitylife.dll
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\BlazorCitylife.pdb
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\BlazorCitylife.genruntimeconfig.cache
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S22OrderDetails.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S22OrderDetails.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\Confirmation.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\Confirmation.razor.g.cs

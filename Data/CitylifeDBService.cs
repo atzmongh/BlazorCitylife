@@ -339,5 +339,16 @@ namespace BlazorCitylife.Data
                 return apartmentDayBlocks;
             }
         }
+        
+        public OrderData s22OrderDetails(int orderId)
+        {
+            //Session["lastOrderDetails"] = orderId;  //Keep the data so we know which order to highlight
+            using (citylifedb8_blContext db = new citylifedb8_blContext())
+            {
+                var theOrder = db.Order.Find(orderId);
+                OrderData theOrderData = new OrderData(theOrder);
+                return theOrderData;
+            }
+        }
     }
 }

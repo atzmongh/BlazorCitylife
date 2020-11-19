@@ -5,35 +5,6 @@
 @inject CitylifeDBService  cityLifeDB
 @inject NavigationManager NavigationManager;
 @inject TranslateBox tBox
-@{
-
-//Layout = "~/Views/sharing/_staffLayout.cshtml";
-//TranslateBox tBox = ViewBag.tBox;
-//DateTime fromDate = ViewBag.fromDate;
-//string fromDateSt = fromDate.ToString("dd/MM/yyyy");
-//DateTime today = ViewBag.today;
-//List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
-//List<Money> revenuePerDay = ViewBag.revenuePerDay;
-//List<Money> expensePerDay = ViewBag.expensePerDay;
-//List<string> expenseTypes = ViewBag.expenseTypes;
-//List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
-//List<double> aveargeDaysPerApartment = ViewBag.aveargeDaysPerApartment;
-//List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
-//EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
-//int highlightOrderId = ViewBag.highlightOrderId;
-//string wideDashboard = ViewBag.wideDashboard;   //contains either the word "checked" or empty
-//int dashboardDays = ViewBag.dashboardDays;
-//List<Employee> maidList = ViewBag.maidList;
-//string wide = "";
-//string high = "";
-//if (wideDashboard == "checked")
-//{
-//    wide = "wide";
-//    high = "high";
-//}
-//string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
-//int colorIndex = 0;
-}
 
 
 
@@ -161,8 +132,8 @@
                                 string color = aDayBlock.orderColor.ToString();
                                 string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
 
-                                <td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" data-order-id="@aDayBlock.orderId" id="@aDayBlock.orderId"
-                                    onclick="showOrder(this)">
+                                <td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" 
+                                    @onclick="()=>ShowOrder(aDayBlock.orderId)">
                                     @line1 <br /> @line2 <br />@line3
                                 </td>
                             }
@@ -274,8 +245,12 @@
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
+    @if (theOrderData != null)
+    {
+        <S22OrderDetails theOrderData="theOrderData"></S22OrderDetails>
+    }
 
-   
+
 </div>
 
 @code
@@ -290,6 +265,7 @@
     List<int> percentOccupancyPerApartment = null;
     List<List<DayBlock>> apartmentDayBlocks;
     private DateTime _fromDate;
+    OrderData theOrderData = null;
     DateTime fromDate
     {
         get { return _fromDate; }
@@ -362,5 +338,10 @@
             wideDashboard = "";
         }
 
+    }
+
+    public void ShowOrder(int orderId)
+    {
+        theOrderData = cityLifeDB.s22OrderDetails(orderId);
     }
 }           

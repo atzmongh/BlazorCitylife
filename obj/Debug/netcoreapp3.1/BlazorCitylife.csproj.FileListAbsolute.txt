@@ -100,3 +100,5 @@ C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S2
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S22OrderDetails.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\Confirmation.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\Confirmation.razor.g.cs
+C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\Properties\ServiceDependencies\citylife4-blazor - Web Deploy\profile.arm.json
+C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.citylife4-blazor - Web Deploy.json

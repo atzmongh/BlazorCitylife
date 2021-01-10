@@ -16,9 +16,11 @@ namespace BlazorCitylife
 {
     public class Startup
     {
+        public static string connectionString;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            connectionString = ConfigurationExtensions.GetConnectionString(Configuration, "citylifeDB");
         }
 
         public IConfiguration Configuration { get; }

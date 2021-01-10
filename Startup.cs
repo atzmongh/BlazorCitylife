@@ -11,11 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorCitylife.Data;
 using CityLife;
+using BlazorCitylife.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorCitylife
 {
     public class Startup
     {
+        public static string connectionString;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -32,6 +35,10 @@ namespace BlazorCitylife
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<CitylifeDBService>();
             services.AddScoped<TranslateBox>();
+            connectionString = Configuration.GetConnectionString("citylifeDB");
+            //services.AddDbContext<citylifedb8_blContext>(options => options.UseSqlServer(connectionString));
+            services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+            //This turns on detailed errors in the console
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

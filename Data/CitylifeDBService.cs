@@ -1,6 +1,7 @@
 ﻿using BlazorCitylife.Models;
 using BlazorCitylife.Shared;
 using CityLife;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -21,8 +22,12 @@ namespace BlazorCitylife.Data
 
         public Employee UserLoggedin(string userName, string password)
         {
-            using(var db = new citylifedb8_blContext())
+            DbContextOptionsBuilder<citylifedb8_blContext> optionsBuilder = new DbContextOptionsBuilder<citylifedb8_blContext>();
+            optionsBuilder.UseSqlServer(Startup.connectionString);
+            
+            using (var db = new citylifedb8_blContext(optionsBuilder.Options))
             {
+                
                 Employee theEmployee = db.Employee.SingleOrDefault(anEmp=>anEmp.UserName == userName);
                 if (theEmployee != null && theEmployee.PasswordHash == password)
                 {

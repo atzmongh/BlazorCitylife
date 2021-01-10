@@ -37,10 +37,11 @@ namespace BlazorCitylife.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
+            if (/*!optionsBuilder.IsConfigured*/true)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=citylifedb8_bl;Trusted_Connection=True;");
+                 optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=citylifedb8_bl;Trusted_Connection=True;");
+               // optionsBuilder.UseSqlServer("Data Source=citylife4dbserver.database.windows.net;Initial Catalog=db_cityLife4;User ID=atzmon.ghilai;Password=TelAviv22;Connect Timeout=60;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿@using BlazorCitylife.Models
-@using CityLife 
+@using CityLife
 @using BlazorCitylife.Data
 @page "/S21dashboard"
 @inject CitylifeDBService  cityLifeDB
@@ -68,7 +68,7 @@
                         }
 
                         <th class="dash02th @wide @weekendBackground @todaysBackground">@aDate.ToString("dd/MM")</th>
- <!--"wide" will make a wider column-->
+                        <!--"wide" will make a wider column-->
                     }
                     <th class="dash02th"></th>
                     <th class="dash02th"></th>
@@ -132,7 +132,7 @@
                                 string color = aDayBlock.orderColor.ToString();
                                 string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
 
-                                <td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" 
+                                <td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days"
                                     @onclick="()=>ShowOrder(aDayBlock.orderId)">
                                     @line1 <br /> @line2 <br />@line3
                                 </td>
@@ -278,7 +278,7 @@
     int dashboardDays;
     DateTime today = FakeDateTime.Now;
     string wideDashboard = "";   //or "checked";
-    int highlightOrderId = 0;  //TBD id of the order which should be highlighted. 
+    int highlightOrderId = 0;  //TBD id of the order which should be highlighted.
     string wide => wideDashboard == "checked" ? "wide" : "";
     string high => wideDashboard == "checked" ? "high" : "";
     string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
@@ -299,8 +299,8 @@
     public void GetDashboardData(DateTime startDate)
     {
         //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
-        //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month. 
-        //In most cases this will yield an end date which is one less that the starting date. The only exception is January 30 and 31, which will 
+        //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month.
+        //In most cases this will yield an end date which is one less that the starting date. The only exception is January 30 and 31, which will
         //end at 1 or 2 of March.
         //For example: start date    end date
         //             10/11/2019    9/12/2019
@@ -310,7 +310,6 @@
         //             1/12/2019     31/12/2019
         //             1/2/2020      29/2/2020 (2020 is leap year)
         dashboardDays = FakeDateTime.monthLength(startDate);
-
 
 
         apartmentDayBlocks = cityLifeDB.s21dashboardPreparation(

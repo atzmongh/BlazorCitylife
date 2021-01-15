@@ -109,15 +109,17 @@
                             if (aDayBlock.status == OrderStatus.Free)
                             {
                                 //This is a free day
-                                <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
-                                    data-date="@aDayBlock.firstDate" onclick="addOrder(this)"></td>
+                                //string selectionCss = "selectedLeft";
+                                string selectedLeft = "selectedLeft";
+                                <td class="dash02td @wide @high @selectionCss" data-apartment-id="@anApartment.First().apartmentNumber"
+                                    data-date="@aDayBlock.firstDate" @onclick="ToggleBorder"></td>
                             }
                             else
                             {
                                 //This is a busy day (or days)
                                 string line1;
-                                string line2;
-                                string line3 = "";
+                            string line2;
+                            string line3 = "";
                                 if (wideDashboard == "checked")
                                 {
                                     //This is a wide dashboard. Prepare the data that should be displayed on the order line
@@ -126,17 +128,18 @@
                                     line3 = aDayBlock.expectedArrival + " " + aDayBlock.staffComments;
                                 }
                                 else
-                                {
-                                    line1 = aDayBlock.name;
-                                    line2 = aDayBlock.price;
-                                }
-                                string color = aDayBlock.orderColor.ToString();
-                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                        {
+                            line1 = aDayBlock.name;
+                            line2 = aDayBlock.price;
+                        }
+                        string color = aDayBlock.orderColor.ToString();
+                        string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
 
-                                <td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" 
+                                <DayBlockCell span="@aDayBlock.days" cellColor="@aDayBlock.orderColor"></DayBlockCell>
+                                @*<td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" 
                                     @onclick="()=>ShowOrder(aDayBlock.orderId)">
                                     @line1 <br /> @line2 <br />@line3
-                                </td>
+                                </td>*@
                             }
                         }
                         <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
@@ -256,6 +259,7 @@
 
 @code
 {
+    string selectionCss = "";
     List<Money> revenuePerDay = null;
     List<Money> expensePerDay = null;
     List<string> expenseTypes = null;
@@ -344,5 +348,17 @@
     public void ShowOrder(int orderId)
     {
         theOrderData = cityLifeDB.s22OrderDetails(orderId);
+    }
+
+    public void ToggleBorder()
+    {
+        if (selectionCss == "")
+        {
+            selectionCss = "selectedLeft";
+        }
+        else
+        {
+            selectionCss = "";
+        }
     }
 }           

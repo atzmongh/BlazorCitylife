@@ -1,0 +1,16 @@
+﻿@using CityLife
+@using BlazorCitylife.Data
+@inject TranslateBox tBox
+
+@{
+    string cssColor = "order" + cellColor.ToString();
+    <td class="dash02td @cssColor" colspan="@span"></td>
+}
+
+@code {
+    [Parameter]
+    public int span { get; set; }
+    [Parameter]
+    public Color cellColor { get; set; }
+
+}

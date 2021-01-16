@@ -3,14 +3,59 @@
 @inject TranslateBox tBox
 
 @{
-    string cssColor = "order" + cellColor.ToString();
-    <td class="dash02td @cssColor" colspan="@span"></td>
+    string cssColor = "";
+    string highlight = "";
+    string selectedLeft = "";
+    string selectedRight = "";
+    if (isFree)
+    {
+        selectedLeft  = startNewOrder ? "selectedLeft" : "";
+        selectedRight = endNewOrder   ? "selectedRight" : "";
+    }
+    else
+    {
+        //this is a busy day block. It should get a color
+        cssColor = "order" + cellColor.ToString();
+        if (isHighlighted)
+        {
+            highlight = "highlight";
+        }
+    }
+
+
+    <td class="dash02td @cssColor @highlight @selectedLeft @selectedRight " colspan="@dayCount" 
+        @onclick="()=>cellClicked(this)">
+        @customerName<br />
+        @price 
+    </td>
 }
 
 @code {
-    [Parameter]
-    public int span { get; set; }
-    [Parameter]
+    [Parameter] //how many days this day block occupied. Relevant only to busy days
+    public int dayCount { get; set; } = 1;
+    [Parameter] //color of that day block
     public Color cellColor { get; set; }
+    [Parameter] //true - this is a free day. False - this is a busy span (1 or more days)
+    public bool isFree { get; set; } = true;
+    [Parameter] //Relevant only to busy day blocks - the user pressed it and it should be highlighted in blue
+    public bool isHighlighted { get; set; } = false;
+    [Parameter] //relevant only to free day block. The user clicked it and it is a start of a new order
+    public bool startNewOrder { get; set; } = false;
+    [Parameter] //relevant only to free day block. The user clicked it and it is the end of a new order
+    public bool endNewOrder { get; set; } = false;
+    [Parameter]
+    public string customerName { get; set; } = "";
+    [Parameter] //order price - relevant only to busy day blocks
+    public string price { get; set; } = "";
+    [Parameter]  //a delegate accepting a method from S21dashboard. It will be called when the user clicks
+    public Action<DayBlockCell> cellClicked { get; set; }
+    [Parameter]  //relevant only for busy day blocks
+    public int orderId { get; set; } = 0;
+    [Parameter]
+    public int apartmentId { get; set; }
+    [Parameter]
+    public DateTime firstDate { get; set; }
 
-}
+
+    }
+

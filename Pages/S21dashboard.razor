@@ -103,43 +103,58 @@
                             colorIndex++;
                             colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
                                                                      //of available colors
-                        }
+                            int columnNumber = 0;
+                            }
+                        
                         @foreach (var aDayBlock in anApartment)
                         {
                             if (aDayBlock.status == OrderStatus.Free)
                             {
                                 //This is a free day
                                 //string selectionCss = "selectedLeft";
-                                string selectedLeft = "selectedLeft";
-                                <td class="dash02td @wide @high @selectionCss" data-apartment-id="@anApartment.First().apartmentNumber"
-                                    data-date="@aDayBlock.firstDate" @onclick="ToggleBorder"></td>
+                                <DayBlockCell isFree="true"
+                                              apartmentId="aDayBlock.apartmentNumber"
+                                              firstDate="aDayBlock.firstDate"
+                                              cellClicked="cellClicked"></DayBlockCell>
+                                @*<td class="dash02td @wide @high @selectionCss" data-apartment-id="@anApartment.First().apartmentNumber"
+                                    data-date="@aDayBlock.firstDate" @onclick="ToggleBorder"></td>*@
+                            columnNumber++;
+                        }
+                        else
+                        {
+                            //This is a busy day (or days)
+                            string line1;
+                            string line2;
+                            string line3 = "";
+                            if (wideDashboard == "checked")
+                            {
+                                //This is a wide dashboard. Prepare the data that should be displayed on the order line
+                                line1 = aDayBlock.phone + " (" + aDayBlock.adults + "+" + aDayBlock.children + ") " + aDayBlock.name;
+                                line2 = aDayBlock.price + "/" + aDayBlock.paid + " - " + aDayBlock.checkout.ToString("dd/MM/yyyy");
+                                line3 = aDayBlock.expectedArrival + " " + aDayBlock.staffComments;
                             }
                             else
                             {
-                                //This is a busy day (or days)
-                                string line1;
-                            string line2;
-                            string line3 = "";
-                                if (wideDashboard == "checked")
-                                {
-                                    //This is a wide dashboard. Prepare the data that should be displayed on the order line
-                                    line1 = aDayBlock.phone + " (" + aDayBlock.adults + "+" + aDayBlock.children + ") " + aDayBlock.name;
-                                    line2 = aDayBlock.price + "/" + aDayBlock.paid + " - " + aDayBlock.checkout.ToString("dd/MM/yyyy");
-                                    line3 = aDayBlock.expectedArrival + " " + aDayBlock.staffComments;
-                                }
-                                else
-                        {
-                            line1 = aDayBlock.name;
-                            line2 = aDayBlock.price;
-                        }
-                        string color = aDayBlock.orderColor.ToString();
-                        string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                line1 = aDayBlock.name;
+                                line2 = aDayBlock.price;
+                            }
+                            string color = aDayBlock.orderColor.ToString();
+                            string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
 
-                                <DayBlockCell span="@aDayBlock.days" cellColor="@aDayBlock.orderColor"></DayBlockCell>
+                                <DayBlockCell isFree="false" 
+                                              dayCount="@aDayBlock.days" 
+                                              cellColor="@aDayBlock.orderColor"
+                                              customerName="@aDayBlock.name"
+                                              price="@aDayBlock.price"
+                                              cellClicked="@cellClicked"
+                                              orderId="aDayBlock.orderId"
+                                              apartmentId="aDayBlock.apartmentNumber"
+                                              firstDate="aDayBlock.firstDate"></DayBlockCell>
                                 @*<td class="dash02td @wide @high @cssColor" colspan="@aDayBlock.days" 
                                     @onclick="()=>ShowOrder(aDayBlock.orderId)">
                                     @line1 <br /> @line2 <br />@line3
                                 </td>*@
+                                columnNumber += aDayBlock.days;
                             }
                         }
                         <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
@@ -284,6 +299,9 @@
     DateTime today = FakeDateTime.Now;
     string wideDashboard = "";   //or "checked";
     int highlightOrderId = 0;  //TBD id of the order which should be highlighted. 
+    DayBlockCell highlightedCell = null;
+    DayBlockCell firstSelectedCell = null;
+    DayBlockCell lastSelectedCell = null;
     string wide => wideDashboard == "checked" ? "wide" : "";
     string high => wideDashboard == "checked" ? "high" : "";
     string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
@@ -359,6 +377,76 @@
         else
         {
             selectionCss = "";
+        }
+    }
+    public void cellClicked(DayBlockCell theCell)
+    {
+        if (theCell.isFree)
+        {
+            setNewOrderBorders(theCell);
+        }
+        else
+        {
+            DayBlockCell previousHighlightedCell = highlightedCell;
+            if (highlightedCell != null)
+            {
+                //there is a previous order which is currently highlighted - turn it off
+                highlightedCell.isHighlighted = false;
+                highlightedCell = null;
+                theOrderData = null;
+            }
+            if (previousHighlightedCell != theCell)
+            {
+                //the user pressed a different cell than before (or it was first time) - highlight the new cell
+                theCell.isHighlighted = true;
+                highlightedCell = theCell;
+                theOrderData = cityLifeDB.s22OrderDetails(theCell.orderId);
+            }
+        }
+        this.StateHasChanged();
+    }
+
+    private void setNewOrderBorders(DayBlockCell clickedCell)
+    {
+        if (firstSelectedCell == null)
+        {
+            //This is the first time the user clicks a free cell
+            clickedCell.startNewOrder = true;
+            firstSelectedCell = clickedCell;
+        }
+        else if (lastSelectedCell == null)
+        {
+            //The user clicked only left cell, now he clicked the right cell
+            if (firstSelectedCell.apartmentId != clickedCell.apartmentId)
+            {
+                //the user clicked on another row - start a new selection
+                firstSelectedCell.startNewOrder = false;
+                firstSelectedCell = null;
+                setNewOrderBorders(clickedCell);
+            }
+            else if (firstSelectedCell.firstDate > clickedCell.firstDate)
+            {
+                //the second user click was on a previous date - reverse the selection
+                DayBlockCell previousFirstCell = firstSelectedCell;
+                firstSelectedCell.startNewOrder = false;
+                firstSelectedCell = null;
+                setNewOrderBorders(clickedCell);
+                setNewOrderBorders(previousFirstCell);
+            }
+            else
+            {
+                clickedCell.endNewOrder = true;
+                lastSelectedCell = clickedCell;
+            }
+        }
+        else
+        {
+            //the user clicked third time - start a new selection
+            firstSelectedCell.startNewOrder = false;
+            lastSelectedCell.endNewOrder = false;
+            firstSelectedCell = null;
+            lastSelectedCell = null;
+            setNewOrderBorders(clickedCell);
         }
     }
 }           

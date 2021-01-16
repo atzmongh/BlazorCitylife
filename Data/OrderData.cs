@@ -250,7 +250,7 @@ namespace BlazorCitylife.Data
         public DayBlock(Order anOrder) : base(anOrder)
         { }
         public int days;
-        public string firstDate;
+        public DateTime firstDate;
     }
 
     public class RevenueAndOccupancy

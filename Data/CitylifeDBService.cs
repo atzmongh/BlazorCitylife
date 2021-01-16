@@ -229,7 +229,7 @@ namespace BlazorCitylife.Data
                                 //But anyway - we will write the dayBlock to the list
                                 dayBlocks.Add(aDayBlock);
                             }
-                            aDayBlock = new DayBlock() { apartmentNumber = anApartment.Number, status = OrderStatus.Free, firstDate = aDate.ToString("yyyy-MM-dd") };//"Free" status denotes a free day
+                            aDayBlock = new DayBlock() { apartmentNumber = anApartment.Number, status = OrderStatus.Free, firstDate = aDate };//"Free" status denotes a free day
                             dayBlocks.Add(aDayBlock);
                             aDayBlock = null;
                         }
@@ -271,7 +271,7 @@ namespace BlazorCitylife.Data
                                 aDayBlock = new DayBlock(anOrder)
                                 {
                                     days = 1,
-                                    firstDate = aDate.ToString("yyyy-MM-dd"),
+                                    firstDate = aDate,
                                 };
                             }
                             else

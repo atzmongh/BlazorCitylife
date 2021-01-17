@@ -3,6 +3,10 @@
 @using CityLife 
 @inject TranslateBox tBox 
 @{
+    if (theOrderData == null)
+    {
+        return;
+    }
     List<string> staffComments = new List<string>();
     if (theOrderData.staffComments != null)
     {

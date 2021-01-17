@@ -39,10 +39,20 @@
     public bool isFree { get; set; } = true;
     [Parameter] //Relevant only to busy day blocks - the user pressed it and it should be highlighted in blue
     public bool isHighlighted { get; set; } = false;
+    private bool _startNewOrder = false;
     [Parameter] //relevant only to free day block. The user clicked it and it is a start of a new order
-    public bool startNewOrder { get; set; } = false;
+    public bool startNewOrder
+    {
+        get { return _startNewOrder; }
+        set { _startNewOrder = value; StateHasChanged(); }
+    }
+    private bool _endNewOrder = false;
     [Parameter] //relevant only to free day block. The user clicked it and it is the end of a new order
-    public bool endNewOrder { get; set; } = false;
+    public bool endNewOrder
+    {
+        get { return _endNewOrder; }
+        set { _endNewOrder = value; StateHasChanged(); }
+    }
     [Parameter]
     public string customerName { get; set; } = "";
     [Parameter] //order price - relevant only to busy day blocks
@@ -56,6 +66,9 @@
     [Parameter]
     public DateTime firstDate { get; set; }
 
-
+    public void stateChanged()
+    {
+        this.StateHasChanged();
     }
+}
 

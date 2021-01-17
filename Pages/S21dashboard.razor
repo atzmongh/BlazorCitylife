@@ -112,6 +112,7 @@
                             {
                                 //This is a free day
                                 //string selectionCss = "selectedLeft";
+                                int a = aDayBlock.adults;    //just for testing.
                                 <DayBlockCell isFree="true"
                                               apartmentId="aDayBlock.apartmentNumber"
                                               firstDate="aDayBlock.firstDate"
@@ -266,7 +267,7 @@
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
     @if (theOrderData != null)
     {
-        <S22OrderDetails theOrderData="theOrderData"></S22OrderDetails>
+        <S22OrderDetails theOrderData="theOrderData" @ref="theOrderDetails"></S22OrderDetails>
     }
 
 
@@ -274,6 +275,7 @@
 
 @code
 {
+    private S22OrderDetails theOrderDetails;
     string selectionCss = "";
     List<Money> revenuePerDay = null;
     List<Money> expensePerDay = null;
@@ -403,7 +405,7 @@
                 theOrderData = cityLifeDB.s22OrderDetails(theCell.orderId);
             }
         }
-        this.StateHasChanged();
+        //this.StateHasChanged();
     }
 
     private void setNewOrderBorders(DayBlockCell clickedCell)

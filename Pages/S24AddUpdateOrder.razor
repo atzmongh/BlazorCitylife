@@ -1,0 +1,71 @@
+﻿@using BlazorCitylife.Data
+@using BlazorCitylife.Models
+@using CityLife;
+@inject CitylifeDBService  cityLifeDB
+@inject TranslateBox tBox
+
+
+@if (theOrderData == null)
+{
+    return;
+}
+<style>
+    .wizard {
+        display: flex;
+    }
+
+    .nonActive {
+        color: black;
+        border-bottom: 1px solid #00C1E5;
+    }
+
+    .active {
+        color: #00C1E5;
+        border-bottom: 2px solid #00C1E5;
+    }
+
+    .wizard li {
+        padding-left: 10px;
+        padding-right: 10px;
+        cursor: pointer;
+    }
+</style>
+
+<div style="position: absolute;background-color:white;top:56px;border:1px solid black" >
+    <div >
+        @tBox.translate("Add/update order for apartment") @theOrderData.apartmentNumber
+    </div>
+
+    <header style="padding-bottom:5px;">
+
+        <ul class="wizard">
+            <li id="liPersonal" class="active" onclick="activate('Personal')">@tBox.translate("Personal")</li>
+            <li id="liBooking" class="nonActive" onclick="activate('Booking')">@tBox.translate("Booking")</li>
+            <li id="liStatus" class="nonActive" onclick="activate('Status')">@tBox.translate("Status")</li>
+        </ul>
+    </header>
+    <form method="post" action="/staff/s25addUpdateOrder">
+        <input type="hidden" id="orderId" name="orderId" value="@theOrderData.orderId" />
+        <div id="divPersonal" style="max-width:500px;margin:10px;">
+            @*@Html.Partial("s24orderPersonal")*@
+        </div>
+        <div id="divBooking" style="display:none">
+            @*@Html.Partial("s25orderBooking")*@
+        </div>
+        <div id="divStatus" style="display:none">
+            @*@Html.Partial("s26orderStatus")*@
+        </div>
+    </form>
+</div>
+
+
+@code {
+    private OrderData theOrderData { get; set; }
+
+    public void DisplayOrderForm(OrderData theOrderData)
+    {
+        this.theOrderData = theOrderData;
+        this.StateHasChanged();
+    }
+
+}

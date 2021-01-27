@@ -31,14 +31,19 @@
 }
 
 @code {
-    [Parameter] //how many days this day block occupied. Relevant only to busy days
-    public int dayCount { get; set; } = 1;
-    [Parameter] //color of that day block
-    public Color cellColor { get; set; }
-    [Parameter] //true - this is a free day. False - this is a busy span (1 or more days)
-    public bool isFree { get; set; } = true;
+        [Parameter] //how many days this day block occupied. Relevant only to busy days
+        public int dayCount { get; set; } = 1;
+        [Parameter] //color of that day block
+        public Color cellColor { get; set; }
+        [Parameter] //true - this is a free day. False - this is a busy span (1 or more days)
+        public bool isFree { get; set; } = true;
+    private bool _isHighlighted = false;
     [Parameter] //Relevant only to busy day blocks - the user pressed it and it should be highlighted in blue
-    public bool isHighlighted { get; set; } = false;
+    public bool isHighlighted
+    {
+        get { return _isHighlighted; }
+        set { _isHighlighted = value; StateHasChanged(); }
+    }
     private bool _startNewOrder = false;
     [Parameter] //relevant only to free day block. The user clicked it and it is a start of a new order
     public bool startNewOrder

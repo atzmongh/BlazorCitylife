@@ -104,3 +104,7 @@ C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\Properties\ServiceDepende
 C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.citylife4-blazor - Web Deploy.json
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\DayBlockCell.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\DayBlockCell.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S23NewOrderDisplay.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S23NewOrderDisplay.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S24AddUpdateOrder.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S24AddUpdateOrder.razor.g.cs

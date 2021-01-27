@@ -1,0 +1,52 @@
+﻿@using BlazorCitylife.Data
+@using BlazorCitylife.Models
+@using CityLife
+@inject NavigationManager NavigationManager;
+@inject TranslateBox tBox
+@{
+    if (theOrderData == null)
+    {
+        return;
+    }
+    List<string> staffComments = new List<string>();
+    if (theOrderData.staffComments != null)
+    {
+        staffComments = theOrderData.staffComments.Split('\n').ToList();
+    }
+}
+<div style="max-width:300px;">
+    <span style="float:left">@tBox.translate("Checkn")</span>
+    <span style="float:right">@theOrderData.checkin.ToString("dd/MM/yyyy")</span>
+    <br />
+    <span style="float:left">@tBox.translate("Checkout")</span>
+    <span style="float:right">@theOrderData.checkout.ToString("dd/MM/yyyy")</span>
+    <br />
+    <span style="float:left">@tBox.translate("Apartment")</span>
+    <span style="float:right">@theOrderData.apartmentNumber</span>
+    <br />
+    <span style="float:left">@tBox.translate("Nights")</span>
+    <span style="float:right">@theOrderData.nights</span>
+    <br />
+    <btn class="btn btn-primary" name="AddOrder" style="float:left" 
+         @onclick="()=>AddOrderClicked(theOrderData)">@tBox.translate("Add Order")</btn>
+</div>
+
+@code {
+    public OrderData theOrderData { get; set; } = null;
+
+    public void DisplayNewOrder(OrderData orderData)
+    {
+        theOrderData = orderData;
+        StateHasChanged();
+    }
+    public void HideNewOrder()
+    {
+        theOrderData = null;
+        StateHasChanged();
+    }
+    [Parameter]
+    public Action<OrderData> AddOrderClicked { get; set; }
+
+    
+
+}

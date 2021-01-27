@@ -265,17 +265,20 @@
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
-    @if (theOrderData != null)
-    {
-        <S22OrderDetails theOrderData="theOrderData" @ref="theOrderDetails"></S22OrderDetails>
-    }
+    
+    <S22OrderDetails theOrderData="theOrderData" @ref="orderDetailsForm"></S22OrderDetails>
+    <S23NewOrderDisplay @ref="newOrderForm" AddOrderClicked="AddOrderClicked"></S23NewOrderDisplay>
+    <S24AddUpdateOrder @ref="addUpdateOrderForm"></S24AddUpdateOrder>
+   
 
 
 </div>
 
 @code
 {
-    private S22OrderDetails theOrderDetails;
+    private S22OrderDetails orderDetailsForm;
+    private S23NewOrderDisplay newOrderForm;
+    private S24AddUpdateOrder addUpdateOrderForm;
     string selectionCss = "";
     List<Money> revenuePerDay = null;
     List<Money> expensePerDay = null;
@@ -288,6 +291,8 @@
     List<List<DayBlock>> apartmentDayBlocks;
     private DateTime _fromDate;
     OrderData theOrderData = null;
+    OrderData newOrderData = new OrderData();
+
     DateTime fromDate
     {
         get { return _fromDate; }
@@ -386,9 +391,11 @@
         if (theCell.isFree)
         {
             setNewOrderBorders(theCell);
+            DisplayNewOrder();
         }
         else
         {
+            //This is a cell containing an order. Highlight it and show the order form under the table
             DayBlockCell previousHighlightedCell = highlightedCell;
             if (highlightedCell != null)
             {
@@ -396,6 +403,8 @@
                 highlightedCell.isHighlighted = false;
                 highlightedCell = null;
                 theOrderData = null;
+                orderDetailsForm.DisplayOrder(theOrderData);
+                newOrderForm.HideNewOrder();
             }
             if (previousHighlightedCell != theCell)
             {
@@ -403,9 +412,10 @@
                 theCell.isHighlighted = true;
                 highlightedCell = theCell;
                 theOrderData = cityLifeDB.s22OrderDetails(theCell.orderId);
+                orderDetailsForm.DisplayOrder(theOrderData);
+                newOrderForm.HideNewOrder();
             }
         }
-        //this.StateHasChanged();
     }
 
     private void setNewOrderBorders(DayBlockCell clickedCell)
@@ -450,5 +460,29 @@
             lastSelectedCell = null;
             setNewOrderBorders(clickedCell);
         }
+    }
+    public void DisplayNewOrder()
+    {
+        OrderData theOrderData = new OrderData();
+        if (firstSelectedCell == null)
+        {
+            //there is no selected free cell - display nothing (not expected)
+            return;
+        }
+        theOrderData.checkin = firstSelectedCell.firstDate;
+        theOrderData.apartmentNumber = firstSelectedCell.apartmentId;
+        theOrderData.checkout = theOrderData.checkin.AddDays(1);  //Assuming only a single day
+        if (lastSelectedCell != null)
+        {
+            //We also have a selection for the end of the order - find the checkout date (1 day after last date)
+            theOrderData.checkout = lastSelectedCell.firstDate.AddDays(1);
+        }
+        theOrderData.nights = (theOrderData.checkout - theOrderData.checkin).Days;
+        orderDetailsForm.HideOrder();
+        newOrderForm.DisplayNewOrder(theOrderData);
+    }
+    public void AddOrderClicked(OrderData theOrderData)
+    {
+        addUpdateOrderForm.DisplayOrderForm(theOrderData);
     }
 }           

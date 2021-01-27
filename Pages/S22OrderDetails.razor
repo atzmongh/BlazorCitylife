@@ -65,7 +65,18 @@
 
 @code {
     [Parameter]
-    public OrderData theOrderData { get; set; }
+    public OrderData theOrderData { get; set; } = null;
+
+    public void DisplayOrder(OrderData orderData)
+    {
+        theOrderData = orderData;
+        StateHasChanged();
+    }
+    public void HideOrder()
+    {
+        theOrderData = null;
+        StateHasChanged();
+    }
     bool showDeleteConfirmation = false;
 
     public void DeleteOrderPopup()

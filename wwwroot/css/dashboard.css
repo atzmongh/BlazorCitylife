@@ -143,5 +143,11 @@ table, th, td {
 .selectCell {
     cursor: pointer;
 }
+.redBorder{
+    border:1px solid red;
+}
+.blackBorder{
+    border:1px solid black;
+}
 
 

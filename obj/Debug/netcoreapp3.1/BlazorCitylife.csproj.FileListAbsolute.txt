@@ -15,7 +15,6 @@ C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Shared\M
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Shared\NavMenu.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Shared\SurveyPrompt.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\_Imports.razor.g.cs
-C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\BlazorCitylife.csprojAssemblyReference.cache
 C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\appsettings.Development.json
 C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\appsettings.json
 C:\testSoftware\BlazorCitylife\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
@@ -108,3 +107,7 @@ C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S2
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S23NewOrderDisplay.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S24AddUpdateOrder.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S24AddUpdateOrder.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S25OrderPersonal.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S25OrderPersonal.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\CInputText.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\CInputText.razor.g.cs

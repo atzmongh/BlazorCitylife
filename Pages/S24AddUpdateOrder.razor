@@ -12,6 +12,7 @@
 <style>
     .wizard {
         display: flex;
+        list-style:none;
     }
 
     .nonActive {
@@ -44,10 +45,10 @@
             <li id="liStatus" class="nonActive" onclick="activate('Status')">@tBox.translate("Status")</li>
         </ul>
     </header>
-    <form method="post" action="/staff/s25addUpdateOrder">
+    <div>
         <input type="hidden" id="orderId" name="orderId" value="@theOrderData.orderId" />
         <div id="divPersonal" style="max-width:500px;margin:10px;">
-            @*@Html.Partial("s24orderPersonal")*@
+            <CInputText name="email" label="email" text="atzmon@gmail.com" error="invalid email"></CInputText>
         </div>
         <div id="divBooking" style="display:none">
             @*@Html.Partial("s25orderBooking")*@
@@ -55,7 +56,7 @@
         <div id="divStatus" style="display:none">
             @*@Html.Partial("s26orderStatus")*@
         </div>
-    </form>
+    </div>
 </div>
 
 

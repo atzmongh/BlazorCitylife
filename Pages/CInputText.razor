@@ -1,0 +1,26 @@
+﻿<div class="form-group">
+    <label for="@name">@label</label>
+    <input type="text" class="form-control @borderColor" id="@name" @bind="@text">
+    <div class="invalid-feedback">
+        @error
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string name { get; set; }
+    [Parameter]
+    public string label { get; set; }
+    [Parameter]
+    public string text { get; set; }
+    [Parameter]
+    public string error { get; set; }
+
+    private string borderColor
+    { get
+        {
+             return (error != ""? "redBorder":"blackBorder");
+        } 
+    }
+
+}

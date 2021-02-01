@@ -111,3 +111,4 @@ C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\S2
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\S25OrderPersonal.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\CInputText.razor.g.cs
 C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\Razor\Pages\CInputText.razor.g.cs
+C:\testSoftware\BlazorCitylife\obj\Debug\netcoreapp3.1\BlazorCitylife.csprojAssemblyReference.cache

@@ -32,7 +32,7 @@
     }
 </style>
 
-<div style="position: absolute;background-color:white;top:56px;border:1px solid black" >
+<div style="position: absolute;background-color:white;top:56px;border:1px solid black; min-width:350px;" >
     <div >
         @tBox.translate("Add/update order for apartment") @theOrderData.apartmentNumber
     </div>
@@ -48,7 +48,8 @@
     <div>
         <input type="hidden" id="orderId" name="orderId" value="@theOrderData.orderId" />
         <div id="divPersonal" style="max-width:500px;margin:10px;">
-            <CInputText name="email" label="email" text="atzmon@gmail.com" error="invalid email"></CInputText>
+            <CInputText name="email" label="email" type="email" value="atzmon@gmail.com"></CInputText>
+            <CInputText name="name" label="name" type="text" ></CInputText>
         </div>
         <div id="divBooking" style="display:none">
             @*@Html.Partial("s25orderBooking")*@

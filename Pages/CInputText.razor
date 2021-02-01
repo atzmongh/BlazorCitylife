@@ -1,9 +1,8 @@
-﻿<div class="form-group">
-    <label for="@name">@label</label>
-    <input type="text" class="form-control @borderColor" id="@name" @bind="@text">
-    <div class="invalid-feedback">
-        @error
-    </div>
+﻿
+<div class='inputBox @errorClass' style='@style'>
+    <input id='@name' name='@name' type='@type' @bind='@value' class='inputElement' />
+    <label for='@name' class='label'>@label</label>
+    <span class='error-text'>@errorMessage</span>
 </div>
 
 @code {
@@ -12,15 +11,26 @@
     [Parameter]
     public string label { get; set; }
     [Parameter]
-    public string text { get; set; }
+    public string value { get; set; }
     [Parameter]
-    public string error { get; set; }
+    public string errorMessage { get; set; } = "";
+    [Parameter]
+    public string style { get; set; }
+    [Parameter]
+    public string type { get; set; } = "text";
 
     private string borderColor
     { get
         {
-             return (error != ""? "redBorder":"blackBorder");
-        } 
+            return (errorMessage != ""? "redBorder":"blackBorder");
+        }
+    }
+    private string errorClass
+    {
+        get
+        {
+            return (errorMessage != "" ? "error" : "");
+        }
     }
 
 }
